@@ -4,41 +4,41 @@ License MIT.
 
 This is a version of the code used in the ArtistBox app for iPhone - http://artistboxapp.com
 
-*/
+Update 17.07.2013 - Youtube changed the layout of the apge so the old code is not working anymore.
+Part of the code from Bob Sims https://github.com/bob-sims/ytPlayer
 
+
+*/
 
 exports = function(videoId, callback) {
 
-	var url = 'http://www.youtube.com/watch?v=' + videoId;
+	var url = 'http://m.youtube.com/watch?ajax=1&layout=mobile&tsp=1&utcoffset=330&v=' + videoId;
+	var referer = 'http://www.youtube.com/watch?v=' + videoId;
 
 	var xhr = Ti.Network.createHTTPClient({
 		onload: function(e) {
-			
-			var res = this.responseText;
 
-
-			var reg = /ls.setItem\('PIGGYBACK_DATA', "\)]}'(.*)\"\);/gmi;
-			var a = reg.exec(res)[1].replace(/\\\"/gim, '\"').replace(/\\\\\\\//gim, '/').replace(/\\\\/gim, '\\');
+			console.log(this.responseText);
 
 			try {
-				var data = JSON.parse(a);
+				var json = this.responseText.substring(4, this.responseText.length);
+				var response = JSON.parse(json);
+				var video = response.content.video;
 
-
-				if (videoId == data.content.video.encrypted_id) {
-					var clip_url = data.content.video.fmt_stream_map[0].url;
-					console.warn(clip_url);
+				if (videoId == video.encrypted_id) {
+					var isHighQuality = video['fmt_stream_map'] != null;
+					var streamUrl = isHighQuality ? video['fmt_stream_map'][0].url : video.stream_url;
 				} else {
 					callback('wrong video return');
 					return;
 				}
-
 			}
 			catch(err) {
 				callback('cannot retrieve video');
 				return;
 			}
-			
-			callback(null, clip_url);
+
+			callback(null, streamUrl);
 		},
 		onerror: function(e) {
 			callback(e.error);
@@ -46,7 +46,14 @@ exports = function(videoId, callback) {
 		timeout: 20000 // in milliseconds
 	});
 
-	xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3');
+	if (Ti.Platform.name == 'iPhone OS') {
+		xhr.setRequestHeader('Referer', referer);
+		xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/536.26.14 (KHTML, like Gecko) Version/6.0.1 Safari/536.26.14');
+	}
+	if (Ti.Platform.name == 'android') {
+		xhr.setRequestHeader('Referer', referer);
+		xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Linux; U; Android 2.2.1; en-gb; GT-I9003 Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1');
+	}
 
 	xhr.open("GET", url);
 	xhr.send();

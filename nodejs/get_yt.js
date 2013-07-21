@@ -55,6 +55,4 @@ var get_clip = function(params, callback) {
 	req.end();
 }
 
-get_clip({videoId:'8CX82uT7A9Y', os:'android'}, function() {
-	console.log(arguments);
-});
+exports.get_clip = get_clip;

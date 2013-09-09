@@ -10,7 +10,7 @@ Part of the code from Bob Sims https://github.com/bob-sims/ytPlayer
 
 */
 
-exports = function(videoId, callback) {
+module.exports = function(videoId, callback) {
 
 	var url = 'http://m.youtube.com/watch?ajax=1&layout=mobile&tsp=1&utcoffset=330&v=' + videoId;
 	var referer = 'http://www.youtube.com/watch?v=' + videoId;
@@ -18,16 +18,18 @@ exports = function(videoId, callback) {
 	var xhr = Ti.Network.createHTTPClient({
 		onload: function(e) {
 
-			console.log(this.responseText);
+			// console.log(this.responseText);
 
 			try {
 				var json = this.responseText.substring(4, this.responseText.length);
 				var response = JSON.parse(json);
+				
+				// console.log(response);
+				
 				var video = response.content.video;
 
 				if (videoId == video.encrypted_id) {
-					var isHighQuality = video['fmt_stream_map'] != null;
-					var streamUrl = isHighQuality ? video['fmt_stream_map'][0].url : video.stream_url;
+					var streamUrl = response.content.player_data.fmt_stream_map ? [0].url : response.content.player_data.stream_url;
 				} else {
 					callback('wrong video return');
 					return;

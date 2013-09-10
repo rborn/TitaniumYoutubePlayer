@@ -35,7 +35,10 @@ var get_clip = function(params, callback) {
 			try {
 				var data = JSON.parse(out.substring(4, out.length));
 				if (data && data.content && data.content.video) {
-					callback(null, data.content.video['fmt_stream_map'] != null ? data.content.video['fmt_stream_map'][0].url : data.content.video.stream_url);
+					
+				var streamUrl = data.content.player_data.fmt_stream_map ? response.content.player_data.fmt_stream_map[0].url : response.content.player_data.stream_url;
+
+					callback(null, streamUrl);
 				} else {
 					callback('wrong_reply');
 				}

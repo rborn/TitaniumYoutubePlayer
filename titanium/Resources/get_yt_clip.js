@@ -29,7 +29,7 @@ module.exports = function(videoId, callback) {
 				var video = response.content.video;
 
 				if (videoId == video.encrypted_id) {
-					var streamUrl = response.content.player_data.fmt_stream_map ? [0].url : response.content.player_data.stream_url;
+					var streamUrl = response.content.player_data.fmt_stream_map ? response.content.player_data.fmt_stream_map[0].url : response.content.player_data.stream_url;
 				} else {
 					callback('wrong video return');
 					return;

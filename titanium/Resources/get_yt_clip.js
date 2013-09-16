@@ -48,6 +48,8 @@ module.exports = function(videoId, callback) {
 		timeout: 20000 // in milliseconds
 	});
 
+	xhr.open("GET", url);
+	
 	if (Ti.Platform.name == 'iPhone OS') {
 		xhr.setRequestHeader('Referer', referer);
 		xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/536.26.14 (KHTML, like Gecko) Version/6.0.1 Safari/536.26.14');
@@ -57,7 +59,6 @@ module.exports = function(videoId, callback) {
 		xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Linux; U; Android 2.2.1; en-gb; GT-I9003 Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1');
 	}
 
-	xhr.open("GET", url);
 	xhr.send();
 
 };
